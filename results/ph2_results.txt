@@ -1,0 +1,85 @@
+NOTE (added by author): The raw output below is unmodified, except that the
+long per-image table is trimmed (see marker). "Run 7" is the Kaggle notebook
+version number. The closing summary calls HAM10000 an "unseen" test set, but
+HAM10000 sensitivity was monitored during training and influenced checkpoint
+selection (epoch 53), so it should be treated as a development set. PH2 and
+PAD-UFES-20 are the unbiased external evaluations. See README.
+
+----- RAW OUTPUT ----- 
+
+ PH2 DATASET — BATCH EVALUATION RESULTS
+  MobileViTv2-100 | BCN20000 trained | Run 7
+=======================================================
+  Total images     : 200
+  Threshold        : 0.64
+-------------------------------------------------------
+  Accuracy         : 0.7250  (72.50%)
+  Sensitivity      : 0.9250  (92.50%)
+  Specificity      : 0.6750  (67.50%)
+  Precision (PPV)  : 0.4157  (41.57%)
+  Neg Pred Value   : 0.9730  (97.30%)
+  F1-Score         : 0.5736
+  AUC-ROC          : 0.9064
+  PR-AUC           : 0.8133
+  MCC              : 0.4829
+  Cohen's Kappa    : 0.4111
+  Balanced Accuracy: 0.8000  (80.00%)
+-------------------------------------------------------
+  Confusion Matrix :
+    TP=37  FP=52
+    FN=3  TN=108
+=======================================================
+
+── Per-class breakdown ──────────────────────────────────
+  Class                   N   Correct    Accuracy   Mean Prob
+  ----------------------------------------------------------
+  melanoma               40       37       92.5%       0.825
+  atypical_nevus         80       48       60.0%       0.554
+  common_nevus           80       60       75.0%       0.495
+
+── Per-image results ────────────────────────────────────
+  Image        Class                Prob        Pred      True      
+  -----------------------------------------------------------------
+  IMD058       melanoma            0.926   MALIGNANT  MALIGNANT  ✅
+  IMD061       melanoma            0.951   MALIGNANT  MALIGNANT  ✅
+  IMD063       melanoma            0.936   MALIGNANT  MALIGNANT  ✅
+  IMD064       melanoma            0.917   MALIGNANT  MALIGNANT  ✅
+  IMD065       melanoma            0.927   MALIGNANT  MALIGNANT  ✅
+  IMD080       melanoma            0.938   MALIGNANT  MALIGNANT  ✅
+  IMD085       melanoma            0.690   MALIGNANT  MALIGNANT  ✅
+  IMD088       melanoma            0.902   MALIGNANT  MALIGNANT  ✅
+  IMD090       melanoma            0.938   MALIGNANT  MALIGNANT  ✅
+  IMD091       melanoma            0.779   MALIGNANT  MALIGNANT  ✅
+  IMD168       melanoma            0.377      BENIGN  MALIGNANT  ❌
+  IMD211       melanoma            0.844   MALIGNANT  MALIGNANT  ✅
+  IMD219       melanoma            0.935   MALIGNANT  MALIGNANT  ✅
+  IMD240       melanoma            0.936   MALIGNANT  MALIGNANT  ✅
+  IMD242       melanoma            0.904   MALIGNANT  MALIGNANT  ✅
+  IMD284       melanoma            0.933   MALIGNANT  MALIGNANT  ✅
+  IMD285       melanoma            0.128      BENIGN  MALIGNANT  ❌
+  IMD348       melanoma            0.906   MALIGNANT  MALIGNANT  ✅
+  IMD349       melanoma            0.792   MALIGNANT  MALIGNANT  ✅
+  IMD403       melanoma            0.791   MALIGNANT  MALIGNANT  ✅
+  IMD404       melanoma            0.870   MALIGNANT  MALIGNANT  ✅
+ 
+  .........
+  .........
+  .............
+
+  IMD394       common_nevus        0.609      BENIGN    BENIGN  ✅
+  IMD395       common_nevus        0.711   MALIGNANT    BENIGN  ❌
+  IMD397       common_nevus        0.598      BENIGN    BENIGN  ✅
+  IMD399       common_nevus        0.644   MALIGNANT    BENIGN  ❌
+  IMD400       common_nevus        0.526      BENIGN    BENIGN  ✅
+  IMD402       common_nevus        0.314      BENIGN    BENIGN  ✅
+
+  Overall: 145/200 correct (72.5%)
+
+=======================================================
+  CROSS-DATASET GENERALISATION SUMMARY
+=======================================================
+  Dataset             Sens     Spec      AUC      N
+  ---------------------------------------------
+  BCN20000 (val)    88.09%   81.83%   0.9281   2047
+  HAM10000          77.38%   72.31%   0.8318  10015
+  PH2               92.50%   67.50%   0.9064    200
