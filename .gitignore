@@ -1,0 +1,34 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+env/
+venv/
+.venv/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model weights and exported models
+*.pth
+*.onnx
+
+# Datasets
+data/
+
+# Logs and local env
+*.log
+.env
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/

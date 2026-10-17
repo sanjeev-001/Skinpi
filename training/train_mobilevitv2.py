@@ -1,3 +1,4 @@
+# Originally run on Kaggle; dataset paths must be adjusted to run locally.
 import os, random, time, json, logging
 from typing import Dict, List, Tuple
 import numpy as np
@@ -95,12 +96,12 @@ class Config:
     PHASE_2_LR_HEAD     = 5e-4
 
     # Phase 3: single flat LR for ALL params
-    # Discriminative LR (prev version) had early layers at 1e-5 — too slow,
+    # Discriminative LR (prev version) had early layers at 1e-5 -- too slow,
     # caused domain shift to explode to 32%. Flat 3e-5 proven better empirically.
     PHASE_3_LR = 3e-5
 
     # ── Early stopping ──────────────────────────────────────────────────────
-    PATIENCE   = 20   # raised from 15 — Phase 3 needs more time
+    PATIENCE   = 20   # raised from 15 -- Phase 3 needs more time
     MIN_EPOCHS = 55   # must reach deep into Phase 3 before stopping
 
     # ── LR schedule ─────────────────────────────────────────────────────────
@@ -108,12 +109,12 @@ class Config:
     T_MULT = 2
 
     # ── Stochastic Weight Averaging ─────────────────────────────────────────
-    SWA_START = 65    # start earlier (was 70) — Phase 3 converges faster now
+    SWA_START = 65    # start earlier (was 70) -- Phase 3 converges faster now
     SWA_LR    = 1e-5  # flat LR during SWA phase
 
     # ── MixUp ───────────────────────────────────────────────────────────────
     MIXUP_ALPHA = 0.2   # Beta distribution parameter
-    MIXUP_PROB  = 0.2   # REDUCED from 0.5 — high prob suppressed malignant signal
+    MIXUP_PROB  = 0.2   # REDUCED from 0.5 -- high prob suppressed malignant signal
                         # (train sens dropped 96%→92%). 20% smooths boundaries
                         # without hurting minority class detection
 
@@ -200,11 +201,11 @@ def get_train_transforms():
         A.RandomGamma(gamma_limit=(70, 130), p=0.5),
         # CLAHE mimics different contrast enhancement settings on scanners
         A.CLAHE(clip_limit=4.0, tile_grid_size=(8, 8), p=0.4),
-        # Random channel-level independent brightness shift — simulates
+        # Random channel-level independent brightness shift -- simulates
         # white-balance differences between scanner manufacturers
         A.RGBShift(r_shift_limit=15, g_shift_limit=15,
                    b_shift_limit=15, p=0.4),
-        # Randomly desaturate 10% of images — forces model to not rely
+        # Randomly desaturate 10% of images -- forces model to not rely
         # on colour alone (HAM10000 has more colour variation)
         A.ToGray(p=0.05),
         # ─────────────────────────────────────────────────────────────────
@@ -430,14 +431,14 @@ def adjust_learning_rates(model, optimizer, epoch, logger):
         logger.info(f"  Head lr={Config.PHASE_2_LR_HEAD}")
 
     # ── Phase 3: full fine-tune, single flat LR ────────────────────────────
-    # FIXED: epoch 32, not 31 — separate from Phase 2 trigger at 31
-    # FIXED: single lr=3e-5 for all params — discriminative LR (prev version)
+    # FIXED: epoch 32, not 31 -- separate from Phase 2 trigger at 31
+    # FIXED: single lr=3e-5 for all params -- discriminative LR (prev version)
     #        had early layers at 1e-5 which was too slow: domain shift hit 32%
     #        because backbone couldn't keep up with head updates. Flat LR keeps
     #        all parts updating at consistent rate, matching best run behaviour.
     elif epoch == Config.PHASE_3_START:     # epoch 32
         unfreeze_all(model)
-        logger.info("📌 Phase 3: full fine-tune — ALL 4.3M params (flat lr=3e-5)")
+        logger.info("📌 Phase 3: full fine-tune -- ALL 4.3M params (flat lr=3e-5)")
         optimizer.param_groups.clear()
         optimizer.add_param_group({
             'params': [p for p in m.parameters() if p.requires_grad],
@@ -653,7 +654,7 @@ def save_test_visualizations(model, test_dataset: HAM10000Dataset,
     fig.legend(handles=[correct_patch, wrong_patch],
                loc='lower right', fontsize=10)
 
-    fig.suptitle(f"HAM10000 Test Samples — Epoch {epoch} "
+    fig.suptitle(f"HAM10000 Test Samples -- Epoch {epoch} "
                  f"(threshold={threshold:.2f})",
                  fontsize=14, fontweight='bold')
     plt.tight_layout()
@@ -664,7 +665,7 @@ def save_test_visualizations(model, test_dataset: HAM10000Dataset,
 
 
 # ============================================================================
-# VISUALIZATION — training curves
+# VISUALIZATION -- training curves
 # ============================================================================
 def plot_training_history(history, save_dir):
     ep  = [h["epoch"] for h in history]
@@ -737,7 +738,7 @@ def plot_training_history(history, save_dir):
                 alpha=0.7, label='Phase 3 start')
     ax2.axvline(Config.SWA_START, color='purple', linestyle=':',
                 alpha=0.7, label='SWA start')
-    ax2.set_title("Domain Shift (|Val Sens − Test Sens|)", fontweight='bold')
+    ax2.set_title("Domain Shift (|Val Sens - Test Sens|)", fontweight='bold')
     ax2.set_ylabel("Gap"); ax2.set_xlabel("Epoch")
     ax2.legend(); ax2.grid(True, alpha=0.3)
     fig2.tight_layout()
@@ -777,7 +778,7 @@ def print_epoch_summary(epoch, tr, va, te, t, lr, threshold,
 # CHECKPOINT HELPERS
 # ============================================================================
 def save_checkpoint(ckpt, path):
-    """Atomic save — crash safe"""
+    """Atomic save -- crash safe"""
     tmp = path + ".tmp"
     torch.save(ckpt, tmp)
     os.replace(tmp, path)
@@ -785,7 +786,7 @@ def save_checkpoint(ckpt, path):
 
 def load_checkpoint(path, model, optimizer, scheduler, scaler, logger):
     logger.info(f"🔄 Resuming from: {path}")
-    # FIXED: weights_only=False — required for checkpoints containing numpy
+    # FIXED: weights_only=False -- required for checkpoints containing numpy
     # arrays and history dicts. Safe because checkpoint is our own file.
     ckpt = torch.load(path, map_location='cpu', weights_only=False)
     model.load_state_dict(ckpt['model_state_dict'])
@@ -869,16 +870,16 @@ def main():
                        f"Starting fresh.")
 
     logger.info(f"🚀 Training from epoch {start_epoch}/{Config.NUM_EPOCHS}")
-    logger.info(f"   Phase 1 : epochs 1–{Config.PHASE_1_END}          "
+    logger.info(f"   Phase 1 : epochs 1-{Config.PHASE_1_END}          "
                 f"(head only,    1K params)")
-    logger.info(f"   Phase 2 : epochs {Config.PHASE_2_END+1}–{Config.PHASE_3_START-1}         "
+    logger.info(f"   Phase 2 : epochs {Config.PHASE_2_END+1}-{Config.PHASE_3_START-1}         "
                 f"(last blocks,  3.8M params)")
-    logger.info(f"   Phase 3 : epochs {Config.PHASE_3_START}–{Config.SWA_START-1}        "
+    logger.info(f"   Phase 3 : epochs {Config.PHASE_3_START}-{Config.SWA_START-1}        "
                 f"(full finetune 4.3M params, flat lr={Config.PHASE_3_LR})")
-    logger.info(f"   SWA     : epochs {Config.SWA_START}–{Config.NUM_EPOCHS}       "
+    logger.info(f"   SWA     : epochs {Config.SWA_START}-{Config.NUM_EPOCHS}       "
                 f"(weight averaging for flat minima)")
     logger.info(f"   MixUp   : alpha={Config.MIXUP_ALPHA}, "
-                f"prob={Config.MIXUP_PROB} (20% batches — light smoothing)")
+                f"prob={Config.MIXUP_PROB} (20% batches -- light smoothing)")
 
     # ------------------------------------------------------------------
     # TRAINING LOOP
@@ -996,7 +997,7 @@ def main():
         else:
             patience_counter += 1
 
-        # 3) Best TEST sensitivity — primary clinical checkpoint
+        # 3) Best TEST sensitivity -- primary clinical checkpoint
         if te["sensitivity"] > best_test_sensitivity:
             best_test_sensitivity = te["sensitivity"]
             ckpt['best_test_sensitivity'] = best_test_sensitivity
@@ -1067,7 +1068,7 @@ def main():
     # ------------------------------------------------------------------
     logger.info("\n🔬 Running TTA on best_test_sensitivity checkpoint...")
     best_ckpt_path = f"{Config.CHECKPOINT_DIR}/best_test_sensitivity.pth"
-    # FIXED: weights_only=False — checkpoint contains numpy arrays in history
+    # FIXED: weights_only=False -- checkpoint contains numpy arrays in history
     best_ckpt      = torch.load(best_ckpt_path, map_location=device,
                                 weights_only=False)
     model.load_state_dict(best_ckpt['model_state_dict'])
@@ -1092,7 +1093,7 @@ def main():
     tta_result = evaluate_tta(model, BCN20000Dataset, tta_paths, tta_labels,
                               device, threshold=saved_threshold)
 
-    logger.info(f"\n🏆 FINAL TTA RESULTS (HAM10000 — best_test_sensitivity ckpt):")
+    logger.info(f"\n🏆 FINAL TTA RESULTS (HAM10000 -- best_test_sensitivity ckpt):")
     logger.info(f"  Sensitivity : {tta_result['sensitivity']:.2%}")
     logger.info(f"  Specificity : {tta_result['specificity']:.2%}")
     logger.info(f"  AUC-ROC     : {tta_result['auc_roc']:.4f}")
@@ -1106,7 +1107,7 @@ def main():
         tta_swa = evaluate_tta(swa_model, BCN20000Dataset,
                                tta_paths, tta_labels,
                                device, threshold=saved_threshold)
-        logger.info(f"\n🏆 FINAL TTA RESULTS — SWA model:")
+        logger.info(f"\n🏆 FINAL TTA RESULTS -- SWA model:")
         logger.info(f"  Sensitivity : {tta_swa['sensitivity']:.2%}")
         logger.info(f"  Specificity : {tta_swa['specificity']:.2%}")
         logger.info(f"  AUC-ROC     : {tta_swa['auc_roc']:.4f}")

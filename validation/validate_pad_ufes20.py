@@ -1,3 +1,4 @@
+# Originally run on Kaggle; dataset paths must be adjusted to run locally.
 import os, numpy as np, torch, torch.nn.functional as F
 import timm, pandas as pd
 from PIL import Image
@@ -91,7 +92,7 @@ bal_acc      = balanced_accuracy_score(all_labels, preds)
 accuracy     = (tp + tn) / len(all_labels)
 
 print("\n" + "="*55)
-print("  PAD-UFES DATASET — BATCH EVALUATION RESULTS")
+print("  PAD-UFES DATASET -- BATCH EVALUATION RESULTS")
 print("  MobileViTv2-100 | BCN20000 trained")
 print("="*55)
 print(f"  Total images     : {len(df)}")
